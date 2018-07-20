@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <link rel="apple-touch-icon" sizes="76x76" href="assets/img/apple-icon.png">
+  <link rel="icon" type="image/png" href="assets/img/favicon.png">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <title>
+    Dosen | @adhamhayukalbu
+  </title>
+  <meta content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0, shrink-to-fit=no' name='viewport' />
+  <!--     Fonts and icons     -->
+  <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:400,700|Material+Icons" />
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
+  <!-- CSS Files -->
+  <link href="assets/css/material-dashboard.css?v=2.1.0" rel="stylesheet" />
+  <!--   Core JS Files   -->
+  <script src="assets/js/core/jquery.min.js" type="text/javascript"></script>
+  <script src="assets/js/core/geturi.js" type="text/javascript"></script>
+  <script src="assets/js/core/popper.min.js" type="text/javascript"></script>
+  <script src="assets/js/core/bootstrap-material-design.min.js" type="text/javascript"></script>
+  <!-- Control Center for Material Dashboard: parallax effects, scripts for the example pages etc -->
+  <script src="assets/js/material-dashboard.min.js?v=2.1.0" type="text/javascript"></script>
+  <script>
+    $(document).ready(function() {
+      var nid = (typeof getUrlVars()["nid"] === 'undefined') ? false: decodeURI(getUrlVars()["nid"]);
+      var nama = (typeof getUrlVars()["nama"] === 'undefined') ? false: decodeURI(getUrlVars()["nama"]);
+      var jurusan_id = (typeof getUrlVars()["jurusan_id"] === 'undefined') ? false: decodeURI(getUrlVars()["jurusan_id"]);
+
+      if(!nid){
+        $('#insert').show();
+        $('#update').hide();
+        $('#delete').hide();
+      }else{
+        $("#nid").val(nid);
+        $("#nama").val(nama);
+        $("#jurusan_id").val(jurusan_id);
+        $('#insert').hide();
+        $('#update').show();
+        $('#delete').show();
+      }
+
+      var url_res_jurusan = "https://openacademy.000webhostapp.com/web-services/php-code/controllers/jurusan_controller.php?action=read";
+      $.getJSON(url_res_jurusan, function(result) {
+          console.log(result);
+          $.each(result, function(i, field) {
+              var id = field.id;
+              var nama = field.nama;
+              var innerhtml = '<option value='+ id +'>' + nama + '</option>';
+              $("#jurusan_id").append(innerhtml);
+          });
+      });
+
+      $("#insert").click(function() {
+        var nid = $("#nid").val();
+        var nama = $("#nama").val();
+        var jurusan_id = $("#jurusan_id").val();
+        var alamat = "";
+        var dataString = "nid=" + nid + "&nama=" + nama + "&jurusan_id=" + jurusan_id + "&alamat=" + alamat + "&insert=";
+        if ($.trim(nid).length > 0 & $.trim(nama).length > 0 & $.trim(jurusan_id).length > 0) {
+          console.log(dataString);
+          $.ajax({
+              type: "POST",
+              url: "https://openacademy.000webhostapp.com/web-services/php-code/controllers/dosen_controller.php",
+              data: dataString,
+              crossDomain: true,
+              cache: false,
+              beforeSend: function() {
+                  $("#insert").val('Connecting...');
+              },
+              success: function(data) {
+                  if (data == "success") {
+                      alert("Record is successfully created");
+                      $("#insert").val('Submit');
+                      $("#dosen_form_view").find("input[type=text]").val("");
+                  } else if (data == "error") {
+                      $("#insert").val('Submit');
+                      alert("Error!");
+                  }
+              }
+          });
+        }
+        return false;
+      });
+
+      $("#update").click(function() {
+        var nid = $("#nid").val();
+        var nama = $("#nama").val();
+        var jurusan_id = $("#jurusan_id").val();
+        var dataString = "nid=" + nid + "&nama=" + nama + "&jurusan_id=" + jurusan_id + "&update=";
+        if ($.trim(nid).length > 0 & $.trim(nama).length > 0 & $.trim(jurusan_id).length > 0) {
+          $.ajax({
+              type: "POST",
+              url: "https://openacademy.000webhostapp.com/web-services/php-code/controllers/dosen_controller.php",
+              data: dataString,
+              crossDomain: true,
+              cache: false,
+              beforeSend: function() {
+                  $("#update").val('Connecting...');
+              },
+              success: function(data) {
+                  if (data == "success") {
+                      alert("Record has been updated");
+                      $("#update").val('Update');
+                      $("#dosen_form_view").find("input[type=text]").val("");
+                  } else if (data == "error") {
+                      $("#update").val('Update');
+                      alert("Error!");
+                  }
+              }
+          });
+        }
+        return false;
+      });
+
+      $("#delete").click(function() {
+        var nid = $("#nid").val();
+        var dataString = "&nid=" + nid;
+        if ($.trim(nid).length > 0) {
+          $.ajax({
+              type: "GET",
+              url: "https://openacademy.000webhostapp.com/web-services/php-code/controllers/dosen_controller.php?action=delete",
+              data: dataString,
+              crossDomain: true,
+              cache: false,
+              beforeSend: function() {
+                  $("#delete").val('Connecting...');
+              },
+              success: function(data) {
+                  if (data == "success") {
+                      alert("Record has been deleted");
+                      $("#delete").val('Delete');
+                      $("#dosen_form_view").find("input[type=text]").val("");
+                  } else if (data == "error") {
+                      $("#delete").val('Delete');
+                      alert("Error!");
+                  }
+              }
+          });
+        }
+        return false;
+      });
+    });
+  </script>
+</head>
+
+<body class="">
+  <div class="wrapper ">
+    <div class="sidebar" data-color="azure" data-background-color="white" data-image="assets/img/sidebar-1.jpg">
+      <div class="logo">
+        <a href="https://github.com/adhamhayukalbu/" class="simple-text logo-normal">
+          @adhamhayukalbu
+        </a>
+      </div>
+      <div class="sidebar-wrapper">
+        <ul class="nav">
+          <li class="nav-item ">
+            <a class="nav-link" href="./index.html">
+              <i class="material-icons">dashboard</i>
+              <p>All</p>
+            </a>
+          </li>
+          <li class="nav-item ">
+            <a class="nav-link" href="./mahasiswa.html">
+              <i class="material-icons">person</i>
+              <p>Mahasiswas</p>
+            </a>
+          </li>
+          <li class="nav-item active ">
+            <a class="nav-link" href="./dosen.html">
+              <i class="material-icons">person</i>
+              <p>Dosens</p>
+            </a>
+          </li>
+          <li class="nav-item ">
+            <a class="nav-link" href="./mata_kuliah.html">
+              <i class="material-icons">library_books</i>
+              <p>Mata Kuliahs</p>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="main-panel">
+      <!-- Navbar -->
+      <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
+        <div class="container-fluid">
+          <div class="navbar-wrapper">
+            <a class="navbar-brand" href="#pablo">Create Form View</a>
+          </div>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" aria-controls="navigation-index" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="navbar-toggler-icon icon-bar"></span>
+            <span class="navbar-toggler-icon icon-bar"></span>
+            <span class="navbar-toggler-icon icon-bar"></span>
+          </button>
+          <div class="collapse navbar-collapse justify-content-end">
+            <ul class="navbar-nav">
+              <!-- <li class="nav-item">
+                <a class="nav-link" href="#pablo">
+                  <i class="material-icons">dashboard</i>
+                  <p class="d-lg-none d-md-block">
+                    Stats
+                  </p>
+                </a>
+              </li> -->
+              <li class="nav-item">
+                <a class="nav-link" href="#pablo">
+                  <i class="material-icons">person</i>
+                  <p class="d-lg-none d-md-block">
+                    Account
+                  </p>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+      <!-- End Navbar -->
+      <div class="content">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-lg-12 col-md-12">
+              <div class="card">
+                <div class="card-header card-header-tabs card-header-info">
+                    <h4 class="card-title">Dosen</h4>
+                </div>
+                <div class="card-body">
+                    <form id="dosen_form_view">
+                        <div class="row">
+                            <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="bmd-label-floating">NIDN</label>
+                                <input id="nid" type="text" class="form-control" required>
+                            </div>
+                            </div>
+                            <div class="col-md-9">
+                            <div class="form-group">
+                                <label class="bmd-label-floating">Nama Lengkap</label>
+                                <input id="nama" type="text" class="form-control">
+                            </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                              <div class="form-group">
+                                  <label class="bmd-label-floating">Jurusan</label>
+                                  <select class="form-control" id="jurusan_id">
+                                    <option selected>Choose...</option>
+                                  </select>
+                              </div>
+                            </div>
+                          </div>
+                        <input id="insert" type="button" class="btn btn-info pull-right" value="Submit"/>
+                        <input id="delete" type="button" class="btn btn-danger pull-right" value="Delete"/>
+                        <input id="update" type="button" class="btn btn-info pull-right" value="Update"/>  
+                        <div class="clearfix"></div>
+                    </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <footer class="footer">
+        <div class="container-fluid">
+          <nav class="float-left">
+            <ul>
+              <li>
+                <a href="https://www.creative-tim.com">
+                  Creative Tim
+                </a>
+              </li>
+              <li>
+                <a href="https://creative-tim.com/presentation">
+                  About Us
+                </a>
+              </li>
+              <li>
+                <a href="http://blog.creative-tim.com">
+                  Blog
+                </a>
+              </li>
+              <li>
+                <a href="https://www.creative-tim.com/license">
+                  Licenses
+                </a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </footer>
+    </div>
+  </div>
+</body>
+</html>
